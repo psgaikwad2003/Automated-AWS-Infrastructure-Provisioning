@@ -1,0 +1,311 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="50%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#070a11" />
+    </linearGradient>
+
+    <!-- Card Gradients -->
+    <linearGradient id="vpcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <linearGradient id="pubSubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#022c22" stop-opacity="0.55"/>
+    </linearGradient>
+
+    <linearGradient id="appSubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#172554" stop-opacity="0.55"/>
+    </linearGradient>
+
+    <linearGradient id="dbSubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4c1d95" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#2e1065" stop-opacity="0.55"/>
+    </linearGradient>
+
+    <linearGradient id="albGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+
+    <linearGradient id="asgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+
+    <linearGradient id="rdsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#7e22ce"/>
+    </linearGradient>
+
+    <!-- Glow & Shadow Filters -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <filter id="glowOrange" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Marker Arrow -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#10b981"/>
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#a855f7"/>
+    </marker>
+  </defs>
+
+  <style>
+    .title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 700; fill: #f8fafc; letter-spacing: 0.5px; }
+    .subtitle { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 400; fill: #94a3b8; }
+    .tier-header { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; }
+    .card-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 600; fill: #ffffff; }
+    .card-sub { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 400; fill: #cbd5e1; }
+    .badge { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 10px; font-weight: 600; }
+    .meta-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; fill: #64748b; }
+  </style>
+
+  <!-- Canvas Background -->
+  <rect width="1200" height="820" rx="16" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- Header Section -->
+  <g transform="translate(50, 45)">
+    <!-- Cloud Icon -->
+    <rect x="0" y="0" width="46" height="46" rx="10" fill="#ff9900" filter="url(#shadow)"/>
+    <path d="M 14 26 A 5 5 0 0 1 18 20 A 7 7 0 0 1 31 20 A 5 5 0 0 1 34 26 A 4 4 0 0 1 33 32 L 14 32 A 4 4 0 0 1 14 26 Z" fill="#ffffff"/>
+    
+    <text x="60" y="24" class="title">Production AWS 3-Tier Automated Architecture</text>
+    <text x="60" y="42" class="subtitle">Fully Automated Infrastructure Provisioning (Terraform) • Config Management (Ansible) • CI/CD (GitHub Actions)</text>
+
+    <!-- Badges Right -->
+    <g transform="translate(770, 8)">
+      <rect x="0" y="0" width="105" height="26" rx="6" fill="#1e293b" stroke="#334155"/>
+      <circle cx="12" cy="13" r="4" fill="#38bdf8"/>
+      <text x="24" y="17" class="badge" fill="#93c5fd">us-east-1</text>
+
+      <rect x="115" y="0" width="115" height="26" rx="6" fill="#1e293b" stroke="#334155"/>
+      <circle cx="127" cy="13" r="4" fill="#10b981"/>
+      <text x="139" y="17" class="badge" fill="#6ee7b7">Multi-AZ (1a/1b)</text>
+
+      <rect x="240" y="0" width="85" height="26" rx="6" fill="#1e293b" stroke="#334155"/>
+      <circle cx="252" cy="13" r="4" fill="#f59e0b"/>
+      <text x="264" y="17" class="badge" fill="#fcd34d">Zero-Trust</text>
+    </g>
+  </g>
+
+  <!-- External Traffic & Internet Source (Left Bar) -->
+  <g transform="translate(50, 120)">
+    <rect x="0" y="0" width="130" height="650" rx="12" fill="#0f172a" stroke="#334155" stroke-dasharray="4 4"/>
+    <text x="65" y="32" text-anchor="middle" class="tier-header" fill="#94a3b8">Clients & CI</text>
+
+    <!-- Users Box -->
+    <g transform="translate(15, 60)">
+      <rect x="0" y="0" width="100" height="90" rx="10" fill="#1e293b" stroke="#475569" filter="url(#shadow)"/>
+      <circle cx="50" cy="35" r="16" fill="#0284c7"/>
+      <!-- User Icon -->
+      <path d="M 44 32 A 6 6 0 1 1 56 32 A 6 6 0 0 1 44 32 Z M 38 46 C 38 42 43 40 50 40 C 57 40 62 42 62 46 Z" fill="#ffffff"/>
+      <text x="50" y="68" text-anchor="middle" class="card-title">Public Users</text>
+      <text x="50" y="80" text-anchor="middle" class="card-sub" fill="#94a3b8">HTTPS (443)</text>
+    </g>
+
+    <!-- DevOps / Engineer Box -->
+    <g transform="translate(15, 180)">
+      <rect x="0" y="0" width="100" height="90" rx="10" fill="#1e293b" stroke="#475569" filter="url(#shadow)"/>
+      <circle cx="50" cy="35" r="16" fill="#10b981"/>
+      <path d="M 42 44 L 58 44 M 45 36 L 50 31 L 55 36 M 45 28 L 55 28" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+      <text x="50" y="68" text-anchor="middle" class="card-title">DevOps Admin</text>
+      <text x="50" y="80" text-anchor="middle" class="card-sub" fill="#94a3b8">SSH / SSM</text>
+    </g>
+
+    <!-- CI/CD Box -->
+    <g transform="translate(15, 300)">
+      <rect x="0" y="0" width="100" height="95" rx="10" fill="#1e293b" stroke="#6366f1" stroke-width="1.5" filter="url(#shadow)"/>
+      <circle cx="50" cy="35" r="16" fill="#4f46e5"/>
+      <path d="M 43 35 L 48 40 L 58 30" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <text x="50" y="68" text-anchor="middle" class="card-title">GitHub Actions</text>
+      <text x="50" y="82" text-anchor="middle" class="card-sub" fill="#a5b4fc">OIDC Auth</text>
+    </g>
+
+    <!-- Ansible Box -->
+    <g transform="translate(15, 425)">
+      <rect x="0" y="0" width="100" height="95" rx="10" fill="#1e293b" stroke="#ec4899" stroke-width="1.5" filter="url(#shadow)"/>
+      <circle cx="50" cy="35" r="16" fill="#db2777"/>
+      <text x="50" y="42" text-anchor="middle" font-family="monospace" font-weight="900" font-size="20" fill="#ffffff">A</text>
+      <text x="50" y="68" text-anchor="middle" class="card-title">Ansible Core</text>
+      <text x="50" y="82" text-anchor="middle" class="card-sub" fill="#f472b6">Dynamic Inv</text>
+    </g>
+
+    <!-- S3 State Box -->
+    <g transform="translate(15, 545)">
+      <rect x="0" y="0" width="100" height="85" rx="10" fill="#1e293b" stroke="#eab308" filter="url(#shadow)"/>
+      <text x="50" y="32" text-anchor="middle" font-size="18">🗄️</text>
+      <text x="50" y="54" text-anchor="middle" class="card-title">TF State (S3)</text>
+      <text x="50" y="70" text-anchor="middle" class="card-sub" fill="#fef08a">+ DynamoDB</text>
+    </g>
+  </g>
+
+  <!-- AWS VPC Enclosure -->
+  <g transform="translate(210, 120)">
+    <rect x="0" y="0" width="940" height="650" rx="14" fill="url(#vpcGrad)" stroke="#ff9900" stroke-width="1.8" filter="url(#shadow)"/>
+    
+    <!-- VPC Header Tag -->
+    <rect x="0" y="0" width="220" height="34" rx="14" fill="#ff9900"/>
+    <text x="18" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto" font-size="13" font-weight="700" fill="#111827">AWS VPC • 10.0.0.0/16</text>
+    <text x="240" y="22" class="meta-text" fill="#cbd5e1">Internet Gateway (igw-attached) • DNS Hostnames Enabled</text>
+
+    <!-- ================= 1. PUBLIC TIER ================= -->
+    <g transform="translate(20, 50)">
+      <rect x="0" y="0" width="900" height="175" rx="10" fill="url(#pubSubGrad)" stroke="#10b981" stroke-width="1.2"/>
+      <text x="16" y="24" class="tier-header" fill="#34d399">Tier 1: Public Subnets (Web &amp; Ingress) • 10.0.0.0/20 &amp; 10.0.16.0/20</text>
+      
+      <!-- External ALB Card -->
+      <g transform="translate(30, 42)">
+        <rect x="0" y="0" width="240" height="110" rx="10" fill="url(#albGrad)" stroke="#38bdf8" stroke-width="1.5" filter="url(#shadow)"/>
+        <text x="18" y="28" class="card-title" font-size="14">External Application LB</text>
+        <text x="18" y="46" class="card-sub">Internet-facing • Dual-AZ</text>
+        <rect x="18" y="60" width="80" height="20" rx="4" fill="#0c4a6e"/>
+        <text x="26" y="74" class="badge" fill="#7dd3fc">Port 80 / 443</text>
+        <text x="18" y="98" class="card-sub" fill="#e0f2fe">SG: Allow 0.0.0.0/0</text>
+      </g>
+
+      <!-- Web Auto Scaling Group (AZ 1a & 1b) -->
+      <g transform="translate(320, 42)">
+        <rect x="0" y="0" width="310" height="110" rx="10" fill="#064e3b" stroke="#10b981" stroke-width="1.5" filter="url(#shadow)"/>
+        <text x="18" y="26" class="card-title" font-size="14">Web ASG: Nginx Proxy</text>
+        <text x="18" y="44" class="card-sub">Launch Template • Auto Scaling (1-3 Instances)</text>
+        
+        <!-- Instance 1a -->
+        <rect x="18" y="58" width="125" height="42" rx="6" fill="#047857"/>
+        <text x="26" y="75" class="card-title" font-size="11">EC2: us-east-1a</text>
+        <text x="26" y="90" class="badge" fill="#a7f3d0">10.0.0.0/20</text>
+
+        <!-- Instance 1b -->
+        <rect x="155" y="58" width="125" height="42" rx="6" fill="#047857"/>
+        <text x="163" y="75" class="card-title" font-size="11">EC2: us-east-1b</text>
+        <text x="163" y="90" class="badge" fill="#a7f3d0">10.0.16.0/20</text>
+      </g>
+
+      <!-- Bastion & NAT Column -->
+      <g transform="translate(660, 42)">
+        <!-- Bastion Host -->
+        <rect x="0" y="0" width="105" height="110" rx="8" fill="#1e293b" stroke="#64748b" stroke-width="1.2"/>
+        <circle cx="20" cy="22" r="6" fill="#10b981"/>
+        <text x="32" y="26" class="card-title" font-size="12">Bastion</text>
+        <text x="12" y="48" class="card-sub">SSH Jumpbox</text>
+        <text x="12" y="66" class="badge" fill="#94a3b8">SSM Enabled</text>
+        <rect x="10" y="78" width="85" height="20" rx="4" fill="#0f172a"/>
+        <text x="16" y="92" class="badge" fill="#38bdf8">EIP Public</text>
+
+        <!-- NAT Gateway -->
+        <g transform="translate(120, 0)">
+          <rect x="0" y="0" width="105" height="110" rx="8" fill="#1e293b" stroke="#0284c7" stroke-width="1.2"/>
+          <circle cx="20" cy="22" r="6" fill="#0284c7"/>
+          <text x="32" y="26" class="card-title" font-size="12">NAT GW</text>
+          <text x="12" y="48" class="card-sub">Outbound Net</text>
+          <text x="12" y="66" class="badge" fill="#94a3b8">AZ-1a EIP</text>
+          <rect x="10" y="78" width="85" height="20" rx="4" fill="#0f172a"/>
+          <text x="16" y="92" class="badge" fill="#67e8f9">Egress Only</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- ================= 2. APP TIER ================= -->
+    <g transform="translate(20, 245)">
+      <rect x="0" y="0" width="900" height="180" rx="10" fill="url(#appSubGrad)" stroke="#3b82f6" stroke-width="1.2"/>
+      <text x="16" y="24" class="tier-header" fill="#60a5fa">Tier 2: Private App Subnets • 10.0.128.0/20 &amp; 10.0.144.0/20 (Isolated)</text>
+      
+      <!-- Internal ALB Card -->
+      <g transform="translate(30, 42)">
+        <rect x="0" y="0" width="240" height="115" rx="10" fill="url(#albGrad)" stroke="#38bdf8" stroke-width="1.5" filter="url(#shadow)"/>
+        <text x="18" y="28" class="card-title" font-size="14">Internal Application LB</text>
+        <text x="18" y="46" class="card-sub">Private Subnet Traffic Only</text>
+        <rect x="18" y="60" width="95" height="20" rx="4" fill="#0c4a6e"/>
+        <text x="24" y="74" class="badge" fill="#7dd3fc">Port 3000 / 8080</text>
+        <text x="18" y="100" class="card-sub" fill="#e0f2fe">SG: Allow only Web SG</text>
+      </g>
+
+      <!-- App Auto Scaling Group (AZ 1a & 1b) -->
+      <g transform="translate(320, 42)">
+        <rect x="0" y="0" width="550" height="115" rx="10" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+        <text x="18" y="26" class="card-title" font-size="14">App ASG: Node.js / Microservices Cluster</text>
+        <text x="18" y="44" class="card-sub">Dynamic Scaling by CPU / Memory Target Tracking • Health Check Route /health</text>
+        
+        <!-- Instance App 1a -->
+        <rect x="18" y="58" width="240" height="45" rx="6" fill="#1d4ed8"/>
+        <text x="28" y="76" class="card-title" font-size="11">EC2 Node Worker (us-east-1a)</text>
+        <text x="28" y="93" class="badge" fill="#bfdbfe">10.0.128.0/20 • IAM Instance Profile</text>
+
+        <!-- Instance App 1b -->
+        <rect x="280" y="58" width="240" height="45" rx="6" fill="#1d4ed8"/>
+        <text x="290" y="76" class="card-title" font-size="11">EC2 Node Worker (us-east-1b)</text>
+        <text x="290" y="93" class="badge" fill="#bfdbfe">10.0.144.0/20 • IAM Instance Profile</text>
+      </g>
+    </g>
+
+    <!-- ================= 3. DATABASE TIER ================= -->
+    <g transform="translate(20, 445)">
+      <rect x="0" y="0" width="900" height="185" rx="10" fill="url(#dbSubGrad)" stroke="#a855f7" stroke-width="1.2"/>
+      <text x="16" y="24" class="tier-header" fill="#c084fc">Tier 3: Private DB Subnets • 10.0.160.0/20 &amp; 10.0.176.0/20 (Zero Public Access)</text>
+      
+      <!-- Primary RDS -->
+      <g transform="translate(140, 45)">
+        <rect x="0" y="0" width="310" height="120" rx="10" fill="url(#rdsGrad)" stroke="#c084fc" stroke-width="1.5" filter="url(#shadow)"/>
+        <circle cx="28" cy="28" r="14" fill="#6b21a8"/>
+        <text x="28" y="34" text-anchor="middle" font-size="14">💾</text>
+        <text x="54" y="32" class="card-title" font-size="14">RDS MySQL 8.0 (Primary)</text>
+        <text x="54" y="48" class="card-sub">Active Read/Write • us-east-1a</text>
+        <rect x="20" y="65" width="115" height="20" rx="4" fill="#3b0764"/>
+        <text x="28" y="79" class="badge" fill="#e9d5ff">Port 3306 (MySQL)</text>
+        <text x="20" y="105" class="card-sub" fill="#f3e8ff">AES-256 Storage Encryption</text>
+      </g>
+
+      <!-- Sync Arrow -->
+      <g transform="translate(470, 95)">
+        <path d="M 0 10 L 50 10" stroke="#c084fc" stroke-width="2.5" stroke-dasharray="4 4" marker-end="url(#arrowPurple)"/>
+        <text x="25" y="0" text-anchor="middle" class="badge" fill="#d8b4fe">Sync Rep</text>
+      </g>
+
+      <!-- Standby RDS -->
+      <g transform="translate(540, 45)">
+        <rect x="0" y="0" width="310" height="120" rx="10" fill="#3b0764" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="3 3" filter="url(#shadow)"/>
+        <circle cx="28" cy="28" r="14" fill="#581c87"/>
+        <text x="28" y="34" text-anchor="middle" font-size="14">💾</text>
+        <text x="54" y="32" class="card-title" font-size="14">RDS Standby (Failover)</text>
+        <text x="54" y="48" class="card-sub">Automatic Multi-AZ • us-east-1b</text>
+        <rect x="20" y="65" width="115" height="20" rx="4" fill="#1e1b4b"/>
+        <text x="28" y="79" class="badge" fill="#c4b5fd">Zero Data Loss</text>
+        <text x="20" y="105" class="card-sub" fill="#e9d5ff">SSM Parameter Store Credentials</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Flow Connectors & Arrows -->
+  <!-- Public Users -> Ext ALB -->
+  <path d="M 180 205 L 255 205" stroke="#38bdf8" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Ext ALB -> Web ASG -->
+  <path d="M 500 215 L 530 215" stroke="#38bdf8" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Web ASG -> Int ALB -->
+  <path d="M 490 275 L 490 320 L 270 320 L 270 365 L 260 365" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 4" fill="none"/>
+  <path d="M 370 275 L 370 380 L 260 380" stroke="#38bdf8" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Int ALB -> App ASG -->
+  <path d="M 500 420 L 530 420" stroke="#38bdf8" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- App ASG -> RDS -->
+  <path d="M 610 520 L 610 565 L 470 565" stroke="#a855f7" stroke-width="2.5" fill="none" marker-end="url(#arrowPurple)"/>
+
+  <!-- Bastion -> Private Subnets (Green flow) -->
+  <path d="M 180 325 L 210 325 L 210 210 L 870 210" stroke="#10b981" stroke-width="1.8" stroke-dasharray="3 3" fill="none" marker-end="url(#arrowGreen)"/>
+
+</svg>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ project_name | default('AWS App') }} — {{ environment | default('dev') | capitalize }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #232f3e 0%, #131921 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 3rem;
+      max-width: 560px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+    .badge {
+      display: inline-block;
+      background: #ff9900;
+      color: #232f3e;
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    p  { color: rgba(255,255,255,0.7); margin-top: 0.75rem; line-height: 1.6; }
+    .meta {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">{{ environment | default('dev') }}</div>
+    <h1>🚀 {{ project_name | default('AWS Infrastructure') }}</h1>
+    <p>Running on AWS — 3-Tier Architecture</p>
+    <p>Web tier powered by nginx on Amazon Linux 2023</p>
+    <div class="meta">
+      <p>Host: {{ ansible_hostname | default('unknown') }}</p>
+      <p>Deployed: {{ ansible_date_time.date | default('') }}</p>
+      <p>Region: {{ aws_region | default('us-east-1') }}</p>
+    </div>
+  </div>
+</body>
+</html>
+

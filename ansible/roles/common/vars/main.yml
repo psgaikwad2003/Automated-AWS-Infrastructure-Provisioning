@@ -1,0 +1,20 @@
+---
+# Common role variables (can be overridden by group_vars or host_vars)
+
+common_packages:
+  - vim
+  - curl
+  - wget
+  - git
+  - jq
+  - unzip
+  - htop
+  - nc
+
+ntp_servers:
+  - 169.254.169.123
+
+ssh_max_auth_tries: 3
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 2
+

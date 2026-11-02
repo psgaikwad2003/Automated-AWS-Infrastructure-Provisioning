@@ -1,0 +1,18 @@
+---
+# Webserver role handlers
+
+- name: reload nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: reloaded
+
+- name: restart nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+
+- name: restart cloudwatch agent
+  ansible.builtin.systemd:
+    name: amazon-cloudwatch-agent
+    state: restarted
+

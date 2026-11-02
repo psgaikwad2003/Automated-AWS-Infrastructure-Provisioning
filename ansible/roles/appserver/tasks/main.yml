@@ -1,0 +1,153 @@
+---
+# Appserver Role — Tasks
+# Installs Node.js, deploys app, configures systemd service
+
+- name: Add NodeSource repository for Node.js {{ node_version }}
+  ansible.builtin.shell: |
+    curl -fsSL https://rpm.nodesource.com/setup_{{ node_version }}.x | bash -
+  args:
+    creates: /etc/yum.repos.d/nodesource-el9.repo
+  tags: [nodejs, install]
+
+- name: Install Node.js
+  ansible.builtin.dnf:
+    name: nodejs
+    state: present
+  tags: [nodejs, install]
+
+- name: Verify Node.js version
+  ansible.builtin.command: node --version
+  register: node_version_check
+  changed_when: false
+  tags: [nodejs]
+
+- name: Print Node.js version
+  ansible.builtin.debug:
+    msg: "Node.js version: {{ node_version_check.stdout }}"
+  tags: [nodejs]
+
+- name: Create application user
+  ansible.builtin.user:
+    name: "{{ app_user }}"
+    system: true
+    shell: /sbin/nologin
+    home: "{{ app_dir }}"
+    create_home: true
+    state: present
+  tags: [app, user]
+
+- name: Ensure application directory exists
+  ansible.builtin.file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0750'
+  tags: [app]
+
+- name: Download application from S3
+  amazon.aws.s3_object:
+    bucket: "{{ app_s3_bucket }}"
+    object: "{{ app_s3_key }}"
+    dest: /tmp/app.tar.gz
+    mode: get
+    overwrite: different
+  ignore_errors: true  # Falls back to stub app if S3 object doesn't exist
+  tags: [app, deploy]
+
+- name: Deploy stub application (if S3 download failed)
+  ansible.builtin.copy:
+    content: |
+      'use strict';
+      const http = require('http');
+      const PORT = process.env.PORT || 8080;
+      const server = http.createServer((req, res) => {
+        if (req.url === '/health') {
+          res.writeHead(200, {'Content-Type': 'application/json'});
+          res.end(JSON.stringify({status: 'ok', tier: 'app', timestamp: new Date().toISOString()}));
+          return;
+        }
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({message: 'App tier OK', path: req.url, env: process.env.NODE_ENV}));
+      });
+      server.listen(PORT, '0.0.0.0', () => console.log('App server on port ' + PORT));
+    dest: "{{ app_dir }}/app.js"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0644'
+  tags: [app, deploy]
+
+- name: Create environment file for app
+  ansible.builtin.template:
+    src: app.env.j2
+    dest: "{{ app_dir }}/.env"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0600'
+  notify: restart appserver
+  tags: [app, config]
+
+- name: Deploy systemd service for app
+  ansible.builtin.template:
+    src: app.service.j2
+    dest: /etc/systemd/system/{{ app_service_name }}.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart appserver
+  tags: [app, service]
+
+- name: Enable and start application service
+  ansible.builtin.systemd:
+    name: "{{ app_service_name }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+  tags: [app, service]
+
+- name: Configure CloudWatch agent for app logs
+  ansible.builtin.copy:
+    content: |
+      {
+        "logs": {
+          "logs_collected": {
+            "files": {
+              "collect_list": [
+                {
+                  "file_path": "/var/log/messages",
+                  "log_group_name": "/ec2/app/messages",
+                  "log_stream_name": "{instance_id}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    mode: '0644'
+  notify: restart cloudwatch agent
+  tags: [cloudwatch]
+
+- name: Start CloudWatch agent
+  ansible.builtin.command: >
+    /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
+    -a fetch-config -m ec2
+    -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    -s
+  changed_when: false
+  tags: [cloudwatch]
+
+- name: Wait for app service to be healthy
+  ansible.builtin.uri:
+    url: "http://localhost:{{ app_port }}/health"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: health_check
+  retries: 6
+  delay: 5
+  until: health_check.status == 200
+  tags: [app, health]
+

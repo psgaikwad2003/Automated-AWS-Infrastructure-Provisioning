@@ -1,0 +1,119 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'terraform/**'
+
+env:
+  TF_VERSION: '1.6.0'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'main' && 'production' || 'development' }}
+
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Determine Environment
+        id: env
+        run: |
+          if [[ "${{ github.base_ref }}" == "main" ]]; then
+            echo "environment=prod" >> $GITHUB_OUTPUT
+            echo "tf_dir=terraform/environments/prod" >> $GITHUB_OUTPUT
+          else
+            echo "environment=dev" >> $GITHUB_OUTPUT
+            echo "tf_dir=terraform/environments/dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Terraform Format Check
+        run: terraform fmt -recursive -check terraform/
+
+      - name: Terraform Init
+        working-directory: ${{ steps.env.outputs.tf_dir }}
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        working-directory: ${{ steps.env.outputs.tf_dir }}
+        run: terraform validate
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ${{ steps.env.outputs.tf_dir }}
+        run: |
+          terraform plan \
+            -var-file=terraform.tfvars \
+            -no-color \
+            -out=tfplan \
+            2>&1 | tee plan_output.txt
+          echo "exitcode=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Comment PR with Plan
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            const planFile = '${{ steps.env.outputs.tf_dir }}/plan_output.txt';
+            let planOutput = '';
+            try {
+              planOutput = fs.readFileSync(planFile, 'utf8');
+            } catch(e) {
+              planOutput = 'Could not read plan output.';
+            }
+            // Truncate to stay within GitHub comment limits
+            if (planOutput.length > 60000) {
+              planOutput = planOutput.substring(0, 60000) + '\n... (truncated)';
+            }
+
+            const exitCode = '${{ steps.plan.outputs.exitcode }}';
+            const status = exitCode === '0' ? '✅ Success' : '❌ Failed';
+
+            const output = `## Terraform Plan — \`${{ steps.env.outputs.environment }}\` ${status}
+
+            <details>
+            <summary>Show Plan Output</summary>
+
+            \`\`\`hcl
+            ${planOutput}
+            \`\`\`
+
+            </details>
+
+            **Triggered by:** @${{ github.actor }}
+            **Workflow:** \`${{ github.workflow }}\`
+            **Commit:** \`${{ github.sha }}\``;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
+
+      - name: Fail if plan errored
+        if: steps.plan.outputs.exitcode != '0'
+        run: exit 1
+

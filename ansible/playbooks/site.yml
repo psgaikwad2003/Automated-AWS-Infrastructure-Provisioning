@@ -1,0 +1,25 @@
+---
+# Master playbook — runs all roles on all tiers
+# Usage: ansible-playbook playbooks/site.yml -i inventory/aws_ec2.yml
+
+- name: Apply common configuration to all servers
+  hosts: all
+  become: true
+  gather_facts: true
+  roles:
+    - common
+
+- name: Configure web servers
+  hosts: webservers
+  become: true
+  gather_facts: true
+  roles:
+    - webserver
+
+- name: Configure app servers
+  hosts: appservers
+  become: true
+  gather_facts: true
+  roles:
+    - appserver
+

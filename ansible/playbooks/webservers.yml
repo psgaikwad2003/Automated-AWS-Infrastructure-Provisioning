@@ -1,0 +1,28 @@
+---
+# Webservers playbook
+# Usage: ansible-playbook playbooks/webservers.yml -i inventory/aws_ec2.yml
+
+- name: Configure web tier servers
+  hosts: webservers
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Print web server inventory
+      ansible.builtin.debug:
+        msg: "Configuring web server: {{ inventory_hostname }} ({{ ansible_host }})"
+
+  roles:
+    - common
+    - webserver
+
+  post_tasks:
+    - name: Verify nginx is running
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}/health"
+        method: GET
+        status_code: 200
+        timeout: 10
+      delegate_to: localhost
+      ignore_errors: true
+

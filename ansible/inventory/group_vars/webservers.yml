@@ -1,0 +1,32 @@
+---
+# Group vars for web servers
+
+# Nginx settings
+nginx_worker_processes: auto
+nginx_worker_connections: 1024
+nginx_keepalive_timeout: 65
+nginx_client_max_body_size: 10m
+nginx_gzip_enabled: true
+
+# App backend connection
+app_backend_port: 8080
+app_health_check_path: /health
+
+# Web server listen port
+web_listen_port: 80
+web_ssl_port: 443
+
+# Document root
+nginx_document_root: /usr/share/nginx/html
+
+# Log paths
+nginx_access_log: /var/log/nginx/access.log
+nginx_error_log: /var/log/nginx/error.log
+
+# CloudWatch log groups
+cloudwatch_logs:
+  - log_path: /var/log/nginx/access.log
+    log_group: /ec2/web/nginx-access
+  - log_path: /var/log/nginx/error.log
+    log_group: /ec2/web/nginx-error
+

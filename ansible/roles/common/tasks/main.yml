@@ -1,0 +1,117 @@
+---
+# Common Role — Tasks
+# Applied to all servers: updates, tools, hardening, CloudWatch, NTP
+
+- name: Update all system packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+    update_cache: true
+  tags: [packages, update]
+
+- name: Install common packages
+  ansible.builtin.dnf:
+    name: "{{ common_packages }}"
+    state: present
+  tags: [packages]
+
+- name: Install AWS CLI (ensure latest)
+  ansible.builtin.shell: |
+    if ! command -v aws &>/dev/null || [[ "$(aws --version 2>&1)" != *"aws-cli/2"* ]]; then
+      curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+      unzip -q /tmp/awscliv2.zip -d /tmp
+      /tmp/aws/install --update
+      rm -rf /tmp/awscliv2.zip /tmp/aws
+    fi
+  args:
+    creates: /usr/local/bin/aws
+  tags: [packages, awscli]
+
+- name: Install Amazon CloudWatch agent
+  ansible.builtin.dnf:
+    name: amazon-cloudwatch-agent
+    state: present
+  tags: [cloudwatch]
+
+- name: Install Amazon SSM agent
+  ansible.builtin.dnf:
+    name: amazon-ssm-agent
+    state: present
+  tags: [ssm]
+
+- name: Enable and start SSM agent
+  ansible.builtin.systemd:
+    name: amazon-ssm-agent
+    enabled: true
+    state: started
+  tags: [ssm]
+
+- name: Configure NTP (chrony) to use AWS Time Sync
+  ansible.builtin.lineinfile:
+    path: /etc/chrony.conf
+    regexp: '^server '
+    line: "server {{ item }} iburst"
+    state: present
+  loop: "{{ ntp_servers }}"
+  notify: restart chrony
+  tags: [ntp]
+
+- name: Set system hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+  tags: [hostname]
+
+- name: Harden SSH — disable password auth
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    validate: /usr/sbin/sshd -t -f %s
+  loop:
+    - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+    - { regexp: '^#?PermitRootLogin',        line: 'PermitRootLogin no' }
+    - { regexp: '^#?MaxAuthTries',           line: 'MaxAuthTries {{ ssh_max_auth_tries }}' }
+    - { regexp: '^#?ClientAliveInterval',    line: 'ClientAliveInterval {{ ssh_client_alive_interval }}' }
+    - { regexp: '^#?ClientAliveCountMax',    line: 'ClientAliveCountMax {{ ssh_client_alive_count_max }}' }
+    - { regexp: '^#?X11Forwarding',          line: 'X11Forwarding no' }
+    - { regexp: '^#?Protocol',               line: 'Protocol 2' }
+  notify: restart sshd
+  tags: [security, ssh]
+
+- name: Configure logrotate for application logs
+  ansible.builtin.template:
+    src: logrotate.j2
+    dest: /etc/logrotate.d/app-logs
+    owner: root
+    group: root
+    mode: '0644'
+  tags: [logrotate]
+
+- name: Set system timezone to UTC
+  community.general.timezone:
+    name: UTC
+  tags: [timezone]
+
+- name: Ensure /var/log/app directory exists
+  ansible.builtin.file:
+    path: /var/log/app
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags: [logging]
+
+- name: Configure kernel parameters for network performance
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+    state: present
+    reload: true
+  loop:
+    - { key: net.core.somaxconn,         value: "65535" }
+    - { key: net.ipv4.tcp_max_syn_backlog, value: "8192" }
+    - { key: vm.swappiness,              value: "10" }
+  tags: [sysctl, performance]
+

@@ -1,0 +1,28 @@
+---
+# Appservers playbook
+# Usage: ansible-playbook playbooks/appservers.yml -i inventory/aws_ec2.yml
+
+- name: Configure application tier servers
+  hosts: appservers
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Print app server inventory
+      ansible.builtin.debug:
+        msg: "Configuring app server: {{ inventory_hostname }} ({{ ansible_host }})"
+
+  roles:
+    - common
+    - appserver
+
+  post_tasks:
+    - name: Verify app is running
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:{{ app_port }}/health"
+        method: GET
+        status_code: 200
+        timeout: 10
+      delegate_to: localhost
+      ignore_errors: true
+

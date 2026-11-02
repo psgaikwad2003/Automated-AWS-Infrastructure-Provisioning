@@ -1,0 +1,39 @@
+---
+# Dynamic AWS EC2 Inventory — uses the amazon.aws.aws_ec2 plugin
+# Requires: pip install boto3 botocore  AND  ansible-galaxy collection install amazon.aws
+
+plugin: amazon.aws.aws_ec2
+
+regions:
+  - us-east-1
+
+# Filter instances by project tags
+filters:
+  "tag:Project": "aws-infra"
+  "tag:ManagedBy": "Terraform"
+  instance-state-name: running
+
+# Construct groups from tags
+keyed_groups:
+  - key: tags.Environment
+    prefix: env
+    separator: "_"
+  - key: tags.Role
+    prefix: role
+    separator: "_"
+
+# Map the 'Role' tag to Ansible groups
+groups:
+  webservers: "'webserver' in tags.get('Role', '')"
+  appservers: "'appserver' in tags.get('Role', '')"
+  bastion:    "'bastion' in tags.get('Role', '')"
+
+# Use private IP for instances behind a bastion
+hostnames:
+  - private-ip-address
+
+# Use private DNS name
+compose:
+  ansible_host: private_ip_address
+  ansible_user: ec2-user
+

@@ -1,0 +1,42 @@
+---
+# Group vars for all hosts
+
+# AWS region
+aws_region: us-east-1
+
+# Project metadata
+project_name: aws-infra
+environment: "{{ lookup('env', 'ENVIRONMENT') | default('dev') }}"
+
+# Common packages to install on all servers
+common_packages:
+  - vim
+  - curl
+  - wget
+  - git
+  - jq
+  - unzip
+  - htop
+  - nc
+  - telnet
+
+# NTP settings
+ntp_servers:
+  - 169.254.169.123  # AWS Time Sync Service
+
+# Log rotation
+logrotate_options:
+  rotate: 7
+  daily: true
+  compress: true
+  missingok: true
+  notifempty: true
+
+# CloudWatch log group prefix
+cloudwatch_log_group_prefix: "/ec2"
+
+# SSH hardening
+ssh_max_auth_tries: 3
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 2
+

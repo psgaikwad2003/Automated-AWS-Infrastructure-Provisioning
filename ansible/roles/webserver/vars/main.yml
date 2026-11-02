@@ -1,0 +1,15 @@
+---
+# Webserver role variables
+
+nginx_worker_processes: auto
+nginx_worker_connections: 1024
+nginx_keepalive_timeout: 65
+nginx_client_max_body_size: 10m
+nginx_gzip_enabled: true
+nginx_document_root: /usr/share/nginx/html
+nginx_access_log: /var/log/nginx/access.log
+nginx_error_log: /var/log/nginx/error.log
+web_listen_port: 80
+web_ssl_port: 443
+app_backend_port: 8080
+

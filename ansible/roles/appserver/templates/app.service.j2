@@ -1,0 +1,38 @@
+[Unit]
+Description={{ project_name }} Application Server ({{ environment }})
+Documentation=https://github.com/your-org/aws-infra
+After=network.target network-online.target
+Requires=network-online.target
+
+[Service]
+Type=simple
+User={{ app_user }}
+Group={{ app_user }}
+WorkingDirectory={{ app_dir }}
+ExecStart=/usr/bin/node {{ app_dir }}/app.js
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+KillMode=process
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Environment
+EnvironmentFile=-{{ app_dir }}/.env
+Environment=NODE_ENV={{ environment }}
+Environment=PORT={{ app_port }}
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={{ app_service_name }}
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths={{ app_dir }} /tmp /var/log/app
+
+[Install]
+WantedBy=multi-user.target
+

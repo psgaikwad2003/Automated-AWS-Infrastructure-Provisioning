@@ -1,0 +1,17 @@
+---
+# Appserver role handlers
+
+- name: reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: restart appserver
+  ansible.builtin.systemd:
+    name: "{{ app_service_name }}"
+    state: restarted
+
+- name: restart cloudwatch agent
+  ansible.builtin.systemd:
+    name: amazon-cloudwatch-agent
+    state: restarted
+

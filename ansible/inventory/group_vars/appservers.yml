@@ -1,0 +1,24 @@
+---
+# Group vars for app servers
+
+# Node.js settings
+node_version: "20"
+app_port: 8080
+app_user: appuser
+app_dir: /opt/app
+app_service_name: appserver
+
+# Application S3 source (override with actual bucket name)
+app_s3_bucket: "{{ project_name }}-{{ environment }}-app-assets"
+app_s3_key: "app/latest/app.tar.gz"
+
+# Application environment variables
+app_env_vars:
+  NODE_ENV: production
+  PORT: "{{ app_port }}"
+
+# CloudWatch log groups
+cloudwatch_logs:
+  - log_path: /var/log/messages
+    log_group: /ec2/app/messages
+

@@ -1,0 +1,11 @@
+---
+# Appserver role variables
+
+node_version: "20"
+app_port: 8080
+app_user: appuser
+app_dir: /opt/app
+app_service_name: appserver
+app_s3_bucket: "{{ project_name }}-{{ environment }}-app-assets"
+app_s3_key: "app/latest/app.tar.gz"
+

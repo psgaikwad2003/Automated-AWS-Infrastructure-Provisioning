@@ -1,0 +1,106 @@
+---
+# Webserver Role — Tasks
+# Installs and configures nginx for the web tier
+
+- name: Install nginx
+  ansible.builtin.dnf:
+    name: nginx
+    state: present
+  tags: [nginx, install]
+
+- name: Ensure nginx directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: nginx
+    group: nginx
+    mode: '0755'
+  loop:
+    - /etc/nginx/conf.d
+    - /usr/share/nginx/html
+    - /var/cache/nginx
+  tags: [nginx]
+
+- name: Deploy nginx configuration
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+    validate: nginx -t -c %s
+  notify: reload nginx
+  tags: [nginx, config]
+
+- name: Deploy index.html
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ nginx_document_root }}/index.html"
+    owner: nginx
+    group: nginx
+    mode: '0644'
+  tags: [nginx, deploy]
+
+- name: Create health check endpoint
+  ansible.builtin.copy:
+    content: '{"status":"ok","tier":"web"}'
+    dest: "{{ nginx_document_root }}/health"
+    owner: nginx
+    group: nginx
+    mode: '0644'
+  tags: [nginx, health]
+
+- name: Enable and start nginx
+  ansible.builtin.systemd:
+    name: nginx
+    enabled: true
+    state: started
+  tags: [nginx]
+
+- name: Configure CloudWatch agent for nginx logs
+  ansible.builtin.copy:
+    content: |
+      {
+        "logs": {
+          "logs_collected": {
+            "files": {
+              "collect_list": [
+                {
+                  "file_path": "{{ nginx_access_log }}",
+                  "log_group_name": "/ec2/web/nginx-access",
+                  "log_stream_name": "{instance_id}",
+                  "timestamp_format": "%d/%b/%Y:%H:%M:%S %z"
+                },
+                {
+                  "file_path": "{{ nginx_error_log }}",
+                  "log_group_name": "/ec2/web/nginx-error",
+                  "log_stream_name": "{instance_id}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    mode: '0644'
+  notify: restart cloudwatch agent
+  tags: [cloudwatch]
+
+- name: Start CloudWatch agent
+  ansible.builtin.command: >
+    /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
+    -a fetch-config -m ec2
+    -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    -s
+  changed_when: false
+  tags: [cloudwatch]
+
+- name: Open HTTP port in firewall (if firewalld is running)
+  ansible.posix.firewalld:
+    port: "{{ web_listen_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  ignore_errors: true
+  tags: [firewall]
+
