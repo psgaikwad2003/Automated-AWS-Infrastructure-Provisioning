@@ -244,10 +244,29 @@ User Request
 
 ## Monitoring & Observability
 
+- **CloudWatch Operational Dashboard**: Real-time cross-tier telemetry for External/Internal ALBs, Web & App ASGs, and RDS.
+- **Automated Metric Alarms & SNS**: High 5XX error rate, low RDS free storage (<5GB), and high CPU utilization alerts routed to SNS.
 - **CloudWatch Metrics**: CPU, memory (via CW agent) for all EC2 instances
 - **CloudWatch Alarms**: CPU thresholds drive ASG scale-up/scale-down
 - **CloudWatch Logs**: nginx access/error logs, app logs, VPC flow logs
 - **RDS Enhanced Monitoring**: Process-level metrics every 60 seconds
 - **RDS Performance Insights**: Query performance tracking (7-day retention)
 - **ALB Access Logs**: Optional; configure S3 bucket in ALB module
+
+---
+
+## Security Layers
+
+1. **AWS WAFv2**: Protects the External ALB against Layer 7 DDoS, SQL injection, cross-site scripting (XSS), and known bad bot traffic.
+2. **Network ACLs & Security Groups**: Stateful boundary isolation ensuring zero direct external access to App or DB subnets.
+3. **IAM Instance Profiles**: Least-privilege roles for EC2 instances with AWS Systems Manager Session Manager access (no SSH key dependency).
+4. **Data Encryption**: Storage encrypted with AES-256 for RDS, EBS volumes, and S3 state/asset buckets.
+
+---
+
+## Operational Runbooks
+
+- [Disaster Recovery Runbook](runbooks/disaster-recovery.md)
+- [Zero-Downtime Deployment Runbook](runbooks/zero-downtime-deployment.md)
+
 

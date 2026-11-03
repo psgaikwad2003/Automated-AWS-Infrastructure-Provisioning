@@ -4,6 +4,7 @@
 
 [![Terraform Plan](https://github.com/psgaikwad2003/Automated-AWS-Infrastructure-Provisioning/actions/workflows/terraform-plan.yml/badge.svg)](https://github.com/psgaikwad2003/Automated-AWS-Infrastructure-Provisioning/actions/workflows/terraform-plan.yml)
 [![Terraform Apply](https://github.com/psgaikwad2003/Automated-AWS-Infrastructure-Provisioning/actions/workflows/terraform-apply.yml/badge.svg)](https://github.com/psgaikwad2003/Automated-AWS-Infrastructure-Provisioning/actions/workflows/terraform-apply.yml)
+[![Security Scan](https://github.com/psgaikwad2003/Automated-AWS-Infrastructure-Provisioning/actions/workflows/security-scan.yml/badge.svg)](https://github.com/psgaikwad2003/Automated-AWS-Infrastructure-Provisioning/actions/workflows/security-scan.yml)
 [![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.6.0-623CE4?logo=terraform&logoColor=white)](https://www.terraform.io/)
 [![Ansible](https://img.shields.io/badge/Ansible-%3E%3D8.0-EE0000?logo=ansible&logoColor=white)](https://www.ansible.com/)
 [![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
@@ -12,7 +13,7 @@
 
 **Production-grade, fully automated AWS 3-tier cloud infrastructure built with Terraform IaC, configured via Ansible, and deployed through GitHub Actions CI/CD with AWS OIDC authentication.**
 
-[Overview](#-overview) • [Architecture](#-architecture) • [Topology](#-network--subnet-topology) • [Modules](#-modular-terraform-design) • [Ansible](#-ansible-configuration-management) • [CI/CD](#-cicd-pipeline-github-actions) • [Quick Start](#-quick-start) • [Security](#-security--compliance)
+[Overview](#-overview) • [Architecture](#-architecture) • [Topology](#-network--subnet-topology) • [Modules](#-modular-terraform-design) • [Ansible](#-ansible-configuration-management) • [CI/CD](#-cicd-pipeline-github-actions) • [Runbooks](#-operational-runbooks) • [Quick Start](#-quick-start) • [Security](#-security--compliance)
 
 </div>
 
@@ -131,6 +132,9 @@ VPC CIDR Block: `10.0.0.0/16` in Region `us-east-1`
 | **`iam`** | `terraform/modules/iam` | Permissions & Security | Instance Roles, SSM Managed Policy, CloudWatch Logs & S3 Access Policies |
 | **`ec2`** | `terraform/modules/ec2` | Secure Access Point | Bastion Host EC2 instance in public subnet |
 | **`s3`** | `terraform/modules/s3` | Object & State Storage | App Assets S3 Bucket, State Bucket, Lifecycle Rules, Public Access Blocks |
+| **`waf`** | `terraform/modules/waf` | Edge Protection | AWS WAFv2 Web ACL, Rate-based Rules, AWS Managed Rules (CRS, Bad Inputs, IP Reputation) |
+| **`monitoring`** | `terraform/modules/monitoring` | Observability & Alerting | Cross-Tier CloudWatch Dashboard, SNS Alert Topic & Metric Alarms (5xx, Disk, CPU) |
+
 
 ---
 
@@ -172,8 +176,19 @@ Merge to develop/main   ──► terraform init       ──► terraform apply
 | **`terraform-plan.yml`** | PR to `main` or `develop` | Runs format check, runs `terraform validate`, calculates `terraform plan`, and automatically comments full diff on the PR. |
 | **`terraform-apply.yml`** | Push to `main` or `develop` | Dynamically detects environment (`dev` for develop, `prod` for main) and safely applies changes. |
 | **`terraform-destroy.yml`** | Manual `workflow_dispatch` | Provides controlled, environment-specific destruction with confirmation safeguards. |
+| **`security-scan.yml`** | PR, push & weekly cron | Automated DevSecOps scanner running Checkov, Trivy, and Ansible-lint. |
 
 ---
+
+## 📚 Operational Runbooks
+
+Production-grade operating procedures and incident recovery guides are maintained in the [`docs/runbooks/`](docs/runbooks/) directory:
+
+- 🚨 **[Disaster Recovery Runbook](docs/runbooks/disaster-recovery.md)**: Procedures for multi-AZ failovers, point-in-time recovery (PITR) for RDS, auto scaling recovery, and DynamoDB lock release.
+- 🔄 **[Zero-Downtime Deployment Runbook](docs/runbooks/zero-downtime-deployment.md)**: Rolling instance refresh procedures, graceful connection draining, canary release strategies, and rollback protocols.
+
+---
+
 
 ## 🚀 Quick Start
 
