@@ -21,7 +21,13 @@
     - /var/cache/nginx
   tags: [nginx]
 
+- name: Provision SSL certificates
+  ansible.builtin.include_tasks: ssl.yml
+  when: nginx_enable_ssl | default(true)
+  tags: [nginx, ssl]
+
 - name: Deploy nginx configuration
+
   ansible.builtin.template:
     src: nginx.conf.j2
     dest: /etc/nginx/nginx.conf

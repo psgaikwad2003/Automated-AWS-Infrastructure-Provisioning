@@ -13,3 +13,15 @@ web_listen_port: 80
 web_ssl_port: 443
 app_backend_port: 8080
 
+# SSL / TLS Settings
+nginx_enable_ssl: true
+nginx_ssl_cert_path: /etc/nginx/ssl/server.crt
+nginx_ssl_key_path: /etc/nginx/ssl/server.key
+nginx_ssl_dhparam_path: /etc/nginx/ssl/dhparam.pem
+nginx_ssl_protocols: "TLSv1.2 TLSv1.3"
+nginx_ssl_ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384"
+
+# Rate Limiting
+nginx_rate_limit_enabled: true
+nginx_rate_limit_rate: "25r/s"
+nginx_rate_limit_burst: 50

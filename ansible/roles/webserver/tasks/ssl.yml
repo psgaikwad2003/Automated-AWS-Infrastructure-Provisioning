@@ -1,0 +1,50 @@
+---
+# Webserver Role — SSL/TLS Certificate Provisioning Tasks
+
+- name: Ensure SSL certificates directory exists
+  ansible.builtin.file:
+    path: /etc/nginx/ssl
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  tags: [nginx, ssl]
+
+- name: Check if SSL certificate already exists
+  ansible.builtin.stat:
+    path: /etc/nginx/ssl/server.crt
+  register: nginx_ssl_cert_stat
+  tags: [nginx, ssl]
+
+- name: Generate self-signed SSL private key
+  ansible.builtin.command:
+    cmd: openssl genrsa -out /etc/nginx/ssl/server.key 2048
+    creates: /etc/nginx/ssl/server.key
+  when: not nginx_ssl_cert_stat.stat.exists
+  notify: reload nginx
+  tags: [nginx, ssl]
+
+- name: Secure SSL private key permissions
+  ansible.builtin.file:
+    path: /etc/nginx/ssl/server.key
+    owner: root
+    group: root
+    mode: '0600'
+  tags: [nginx, ssl]
+
+- name: Generate self-signed SSL certificate
+  ansible.builtin.command:
+    cmd: >
+      openssl req -new -x509 -key /etc/nginx/ssl/server.key -out /etc/nginx/ssl/server.crt -days 365
+      -subj "/C=US/ST=Cloud/L=DevOps/O={{ project_name | default('aws-infra') }}/CN=web.local"
+    creates: /etc/nginx/ssl/server.crt
+  when: not nginx_ssl_cert_stat.stat.exists
+  notify: reload nginx
+  tags: [nginx, ssl]
+
+- name: Generate Diffie-Hellman parameters for enhanced forward secrecy
+  ansible.builtin.command:
+    cmd: openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
+    creates: /etc/nginx/ssl/dhparam.pem
+  notify: reload nginx
+  tags: [nginx, ssl]
