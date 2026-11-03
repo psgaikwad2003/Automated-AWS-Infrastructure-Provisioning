@@ -168,3 +168,20 @@ variable "enable_deletion_protection" {
   default     = false
 }
 
+# ---------------------------------------------------------------------------
+# WAF Security
+# ---------------------------------------------------------------------------
+
+variable "enable_waf" {
+  description = "Enable AWS WAFv2 Web ACL on external ALB"
+  type        = bool
+  default     = true
+}
+
+variable "waf_rate_limit" {
+  description = "WAF IP rate limit (requests per 5 minutes)"
+  type        = number
+  default     = 2000
+}
+
+

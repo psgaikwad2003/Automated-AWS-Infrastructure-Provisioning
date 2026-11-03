@@ -59,3 +59,9 @@ output "ec2_instance_profile_name" {
   value       = module.iam.instance_profile_name
 }
 
+output "web_acl_arn" {
+  description = "ARN of the WAF Web ACL protecting the external ALB"
+  value       = module.waf.web_acl_arn
+}
+
+

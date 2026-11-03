@@ -102,3 +102,14 @@ module "rds" {
   enable_deletion_protection = var.enable_deletion_protection
 }
 
+module "waf" {
+  source = "./modules/waf"
+
+  project_name = var.project_name
+  environment  = var.environment
+  alb_arn      = module.alb.web_alb_arn
+  rate_limit   = var.waf_rate_limit
+  enable_waf   = var.enable_waf
+}
+
+
