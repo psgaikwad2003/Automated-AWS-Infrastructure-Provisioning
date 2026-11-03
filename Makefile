@@ -1,4 +1,4 @@
-.PHONY: init plan apply destroy lint format validate clean help ansible-ping ansible-deploy
+.PHONY: init plan apply destroy lint format validate clean help ansible-ping ansible-deploy security-scan test
 
 ENVIRONMENT ?= dev
 TF_DIR = terraform/environments/$(ENVIRONMENT)
@@ -11,6 +11,13 @@ init: ## Initialize Terraform
 
 validate: ## Validate Terraform configuration
 	cd $(TF_DIR) && terraform validate
+
+test: ## Run local validation suite
+	bash scripts/validate.sh
+
+security-scan: ## Run local security analysis with checkov
+	checkov -d terraform/ --framework terraform
+
 
 format: ## Format Terraform code
 	terraform fmt -recursive terraform/

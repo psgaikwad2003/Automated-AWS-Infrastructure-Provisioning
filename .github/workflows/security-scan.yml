@@ -1,0 +1,89 @@
+name: Security & Compliance Scan
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'terraform/**'
+      - 'ansible/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'terraform/**'
+      - 'ansible/**'
+      - '.github/workflows/**'
+  schedule:
+    # Run weekly every Sunday at midnight UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  iac-security-scan:
+    name: Checkov IaC Security Scanner
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov Static Analysis
+        run: |
+          checkov \
+            --directory terraform/ \
+            --framework terraform \
+            --output cli \
+            --soft-fail \
+            --summary-position bottom
+
+  trivy-vuln-scan:
+    name: Trivy Vulnerability & Misconfig Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
+
+  ansible-lint:
+    name: Ansible Syntax & Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Ansible & Boto3
+        run: |
+          pip install ansible boto3 botocore
+
+      - name: Check Ansible Playbooks Syntax
+        run: |
+          ansible-playbook ansible/playbooks/site.yml --syntax-check
+          ansible-playbook ansible/playbooks/webservers.yml --syntax-check
+          ansible-playbook ansible/playbooks/appservers.yml --syntax-check
