@@ -55,26 +55,14 @@
   ignore_errors: true  # Falls back to stub app if S3 object doesn't exist
   tags: [app, deploy]
 
-- name: Deploy stub application (if S3 download failed)
-  ansible.builtin.copy:
-    content: |
-      'use strict';
-      const http = require('http');
-      const PORT = process.env.PORT || 8080;
-      const server = http.createServer((req, res) => {
-        if (req.url === '/health') {
-          res.writeHead(200, {'Content-Type': 'application/json'});
-          res.end(JSON.stringify({status: 'ok', tier: 'app', timestamp: new Date().toISOString()}));
-          return;
-        }
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify({message: 'App tier OK', path: req.url, env: process.env.NODE_ENV}));
-      });
-      server.listen(PORT, '0.0.0.0', () => console.log('App server on port ' + PORT));
+- name: Deploy application server entrypoint
+  ansible.builtin.template:
+    src: app.js.j2
     dest: "{{ app_dir }}/app.js"
     owner: "{{ app_user }}"
     group: "{{ app_user }}"
     mode: '0644'
+  notify: restart appserver
   tags: [app, deploy]
 
 - name: Create environment file for app

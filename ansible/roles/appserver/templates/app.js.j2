@@ -1,0 +1,119 @@
+/**
+ * {{ project_name }} Production Application Server
+ * Environment: {{ environment }}
+ */
+'use strict';
+
+const http = require('http');
+const os = require('os');
+
+const PORT = parseInt(process.env.PORT, 10) || {{ app_port }};
+const ENV = process.env.NODE_ENV || '{{ environment }}';
+const DB_HOST = process.env.DB_HOST || 'localhost';
+const DB_NAME = process.env.DB_NAME || 'appdb';
+
+let isShuttingDown = false;
+const startTime = Date.now();
+
+const server = http.createServer((req, res) => {
+  // Reject new requests during graceful shutdown
+  if (isShuttingDown) {
+    res.writeHead(503, { 'Content-Type': 'application/json', 'Connection': 'close' });
+    res.end(JSON.stringify({ error: 'Server is shutting down' }));
+    return;
+  }
+
+  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+
+  // Health probe endpoint for Internal ALB & local checks
+  if (url.pathname === '/health' || url.pathname === '/api/health') {
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store, no-cache, must-revalidate'
+    });
+    res.end(JSON.stringify({
+      status: 'ok',
+      tier: 'app',
+      environment: ENV,
+      uptimeSeconds: Math.floor((Date.now() - startTime) / 1000),
+      timestamp: new Date().toISOString()
+    }));
+    return;
+  }
+
+  // System status & metrics endpoint
+  if (url.pathname === '/api/status' || url.pathname === '/status') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      status: 'healthy',
+      service: '{{ project_name }}-app',
+      hostname: os.hostname(),
+      platform: process.platform,
+      nodeVersion: process.version,
+      memory: {
+        totalMb: Math.round(os.totalmem() / 1024 / 1024),
+        freeMb: Math.round(os.freemem() / 1024 / 1024),
+        processRssMb: Math.round(process.memoryUsage().rss / 1024 / 1024)
+      },
+      db: {
+        configuredHost: DB_HOST,
+        database: DB_NAME
+      },
+      uptime: process.uptime()
+    }));
+    return;
+  }
+
+  // Root endpoint
+  if (url.pathname === '/' || url.pathname === '/api') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      message: 'Automated 3-Tier AWS Architecture — App Backend Online',
+      environment: ENV,
+      hostname: os.hostname(),
+      endpoints: ['/health', '/api/status']
+    }));
+    return;
+  }
+
+  // 404 handler
+  res.writeHead(404, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: 'Not Found', path: url.pathname }));
+});
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`[INFO] Server running on port ${PORT} in ${ENV} mode (PID: ${process.pid})`);
+});
+
+// ---------------------------------------------------------------------------
+// Graceful Shutdown Handler
+// ---------------------------------------------------------------------------
+function handleShutdown(signal) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  console.log(`[INFO] Received ${signal}. Starting graceful shutdown...`);
+
+  // Stop accepting new connections
+  server.close(() => {
+    console.log('[INFO] All HTTP connections closed cleanly. Exiting.');
+    process.exit(0);
+  });
+
+  // Force close if connections don't drain within 10 seconds
+  setTimeout(() => {
+    console.error('[ERROR] Forced shutdown after timeout.');
+    process.exit(1);
+  }, 10000).unref();
+}
+
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+process.on('SIGINT', () => handleShutdown('SIGINT'));
+
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL] Uncaught exception:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[ERROR] Unhandled Rejection at:', promise, 'reason:', reason);
+});
