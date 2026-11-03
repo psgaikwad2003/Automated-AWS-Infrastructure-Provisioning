@@ -112,4 +112,20 @@ module "waf" {
   enable_waf   = var.enable_waf
 }
 
+module "monitoring" {
+  source = "./modules/monitoring"
+
+  project_name                = var.project_name
+  environment                 = var.environment
+  web_alb_arn_suffix          = module.alb.web_alb_arn_suffix
+  web_target_group_arn_suffix = module.alb.web_target_group_arn_suffix
+  app_alb_arn_suffix          = module.alb.app_alb_arn_suffix
+  app_target_group_arn_suffix = module.alb.app_target_group_arn_suffix
+  web_asg_name                = module.autoscaling.web_asg_name
+  app_asg_name                = module.autoscaling.app_asg_name
+  db_instance_id              = module.rds.rds_instance_id
+  alert_email                 = var.alert_email
+}
+
+
 

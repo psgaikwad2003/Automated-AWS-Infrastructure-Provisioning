@@ -64,4 +64,15 @@ output "web_acl_arn" {
   value       = module.waf.web_acl_arn
 }
 
+output "cloudwatch_dashboard_name" {
+  description = "Name of the CloudWatch operational dashboard"
+  value       = module.monitoring.dashboard_name
+}
+
+output "sns_alert_topic_arn" {
+  description = "ARN of the SNS topic for infrastructure alert notifications"
+  value       = module.monitoring.sns_topic_arn
+}
+
+
 

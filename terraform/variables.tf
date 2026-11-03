@@ -184,4 +184,15 @@ variable "waf_rate_limit" {
   default     = 2000
 }
 
+# ---------------------------------------------------------------------------
+# Monitoring & Alerting
+# ---------------------------------------------------------------------------
+
+variable "alert_email" {
+  description = "Optional email address for critical SNS alarm notifications"
+  type        = string
+  default     = ""
+}
+
+
 
